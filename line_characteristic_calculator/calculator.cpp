@@ -8,7 +8,7 @@ using namespace std;
 
 Calculator::Calculator(void)
 {
-	readFile();
+	readFile(); 
 	_Point p_tmp;
 	p_tmp.x = _FAKE_VALUE;
 	a.push_back(p_tmp);
