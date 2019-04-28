@@ -1,0 +1,192 @@
+﻿<Page
+    x:Class="line_characteristics_calculator.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:line_characteristics_calculator"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <Polyline x:ConnectionId='2' x:Name="data_graph" Stroke="DarkGoldenRod" StrokeThickness="2" />
+
+        <ComboBox x:ConnectionId='3' x:Name="a_begin_combo" Header="Begin of a" PlaceholderText="Pick a point" Width="150" Margin="20, 0, 0, 0" 
+                                                            >
+        </ComboBox>
+        
+        <Viewbox x:ConnectionId='4' x:Name="a_begin_mark" Width="50" Height="50"
+                 HorizontalAlignment="Left" VerticalAlignment="Top">
+        <Grid Width="50" Height="40">
+            <Ellipse Fill="SteelBlue" Height="8" Width="8"  
+                     HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <TextBlock Text="a begin" FontSize="10" ToolTipService.ToolTip="Begin of a"/>
+        </Grid>            
+        </Viewbox>
+
+
+        <ComboBox x:ConnectionId='5' x:Name="a_end_combo" Header="End of a" PlaceholderText="Pick a point" Width="150" Margin="190, 0, 0, 0" 
+                                                          >
+        </ComboBox>
+        <Viewbox x:ConnectionId='6' x:Name="a_end_mark" Width="50" Height="50"
+                 HorizontalAlignment="Left" VerticalAlignment="Top">
+            <Grid Width="50" Height="40">
+                <Ellipse Fill="SteelBlue" Height="8" Width="8"
+                     HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <TextBlock Text="a end" FontSize="10" ToolTipService.ToolTip="End of a"/>
+            </Grid>
+        </Viewbox>
+
+        <ComboBox x:ConnectionId='7' x:Name="b_begin_combo" Header="Begin of b" PlaceholderText="Pick a point" Width="150" Margin="20, 80, 0, 0" 
+                                                            >
+        </ComboBox>
+        <Viewbox x:ConnectionId='8' x:Name="b_begin_mark" Width="50" Height="50"
+                 HorizontalAlignment="Left" VerticalAlignment="Top">
+            <Grid Width="50" Height="40">
+                <Ellipse Fill="SteelBlue" Height="8" Width="8"
+                     HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <TextBlock Text="b begin" FontSize="10" ToolTipService.ToolTip="Begin of b"/>
+            </Grid>
+        </Viewbox>
+
+        <ComboBox x:ConnectionId='9' x:Name="b_end_combo" Header="End of b" PlaceholderText="Pick a point" Width="150" Margin="190, 80, 0, 0" 
+                                                          >
+        </ComboBox>
+        <Viewbox x:ConnectionId='10' x:Name="b_end_mark" Width="50" Height="50"
+                 HorizontalAlignment="Left" VerticalAlignment="Top">
+            <Grid Width="50" Height="40">
+                <Ellipse Fill="SteelBlue" Height="8" Width="8" 
+                     HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <TextBlock Text="b end" FontSize="10" ToolTipService.ToolTip="End of b"/>
+            </Grid>
+        </Viewbox>
+
+        <ComboBox x:ConnectionId='11' x:Name="c_begin_combo" Header="Begin of c" PlaceholderText="Pick a point" Width="150" Margin="20, 160, 0, 0" 
+                                                            >
+        </ComboBox>
+        <Viewbox x:ConnectionId='12' x:Name="c_begin_mark" Width="50" Height="50"
+                 HorizontalAlignment="Left" VerticalAlignment="Top">
+            <Grid Width="50" Height="40">
+                <Ellipse Fill="SteelBlue" Height="8" Width="8"
+                     HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <TextBlock Text="c begin" FontSize="10" ToolTipService.ToolTip="Begin of c"/>
+            </Grid>
+        </Viewbox>
+
+        <ComboBox x:ConnectionId='13' x:Name="c_end_combo" Header="End of c" PlaceholderText="Pick a point" Width="150" Margin="190, 160, 0, 0" 
+                                                          >
+        </ComboBox>
+        <Viewbox x:ConnectionId='14' x:Name="c_end_mark" Width="50" Height="50"
+                 HorizontalAlignment="Left" VerticalAlignment="Top">
+            <Grid Width="50" Height="40">
+                <Ellipse Fill="SteelBlue" Height="8" Width="8"
+                     HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <TextBlock Text="c end" FontSize="10" ToolTipService.ToolTip="End of c"/>
+            </Grid>
+        </Viewbox>
+
+        <ComboBox x:ConnectionId='15' x:Name="d_begin_combo" Header="Begin of d" PlaceholderText="Pick a point" Width="150" Margin="20, 240, 0, 0" 
+                                                            >
+        </ComboBox>
+        <Viewbox x:ConnectionId='16' x:Name="d_begin_mark" Width="50" Height="50"
+                 HorizontalAlignment="Left" VerticalAlignment="Top">
+            <Grid Width="50" Height="40">
+                <Ellipse Fill="SteelBlue" Height="8" Width="8"
+                     HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <TextBlock Text="d begin" FontSize="10" ToolTipService.ToolTip="Begin of d"/>
+            </Grid>
+        </Viewbox>
+
+        <ComboBox x:ConnectionId='17' x:Name="d_end_combo" Header="End of d" PlaceholderText="Pick a point" Width="150" Margin="190, 240, 0, 0" 
+                                                          >
+        </ComboBox>
+        <Viewbox x:ConnectionId='18' x:Name="d_end_mark" Width="50" Height="50"
+                 HorizontalAlignment="Left" VerticalAlignment="Top">
+            <Grid Width="50" Height="40">
+                <Ellipse Fill="SteelBlue" Height="8" Width="8"
+                     HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <TextBlock Text="d end" FontSize="10" ToolTipService.ToolTip="End of d"/>
+            </Grid>
+        </Viewbox>
+
+        <ComboBox x:ConnectionId='19' x:Name="e_begin_combo" Header="Begin of e" PlaceholderText="Pick a point" Width="150" Margin="20, 320, 0, 0" 
+                                                            >
+        </ComboBox>
+        <Viewbox x:ConnectionId='20' x:Name="e_begin_mark" Width="50" Height="50"
+                 HorizontalAlignment="Left" VerticalAlignment="Top">
+            <Grid Width="50" Height="40">
+                <Ellipse Fill="SteelBlue" Height="8" Width="8" 
+                     HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <TextBlock Text="e begin" FontSize="10" ToolTipService.ToolTip="Begin of e"/>
+            </Grid>
+        </Viewbox>
+
+        <ComboBox x:ConnectionId='21' x:Name="e_end_combo" Header="End of e" PlaceholderText="Pick a point" Width="150" Margin="190, 320, 0, 0" 
+                                                          >
+        </ComboBox>
+        <Viewbox x:ConnectionId='22' x:Name="e_end_mark" Width="50" Height="50" HorizontalAlignment="Left" VerticalAlignment="Top">
+            <Grid Width="50" Height="40">
+                <Ellipse Fill="SteelBlue" Height="8" Width="8" 
+                     HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <TextBlock Text="e end" FontSize="10" ToolTipService.ToolTip="End of e"/>
+            </Grid>
+        </Viewbox>
+
+        <Button x:ConnectionId='23' x:Name="calc_btn" Width="150" Margin="450, 340, 0, 0" 
+                                                 
+             HorizontalAlignment="Left" VerticalAlignment="Top">
+            Start calculation
+        </Button>
+
+        <ComboBox x:ConnectionId='24' x:Name="method_combo" Header="Method" PlaceholderText="Choose method for approximation" Width="150" Margin="650, 340, 0, 0">
+            <x:String>Brute force method</x:String>
+            <x:String>Piece-polynomial approximation</x:String>
+        </ComboBox>
+        
+
+        <TextBlock Margin="450, 400, 0, 0">Step from a to b: </TextBlock>
+        <TextBlock x:ConnectionId='25' x:Name="step_ans_lbl" Margin="650, 400, 0, 0">not defined</TextBlock>
+        <TextBlock Margin="450, 420, 0, 0">Angle between c and d: </TextBlock>
+        <TextBlock x:ConnectionId='26' x:Name="angle_ans_lbl" Margin="650, 420, 0, 0">not defined</TextBlock>
+        <TextBlock Margin="450, 440, 0, 0">Crosspoint of c and d: </TextBlock>
+        <TextBlock x:ConnectionId='27' x:Name="crosspoint_ans_lbl" Margin="650, 440, 0, 0">not defined</TextBlock>
+        <TextBlock Margin="450, 460, 0, 0">Ellipse center: </TextBlock>
+        <TextBlock x:ConnectionId='28' x:Name="ellipse_center_ans_lbl" Margin="650, 460, 0, 0">not defined</TextBlock>
+        <TextBlock Margin="450, 480, 0, 0">Ellipse semiaxes: </TextBlock>
+        <TextBlock x:ConnectionId='29' x:Name="ellipse_cemiaxes_ans_lbl" Margin="650, 480, 0, 0">not defined</TextBlock>
+        <TextBlock Margin="450, 500, 0, 0">Ellipse decline: </TextBlock>
+        <TextBlock x:ConnectionId='30' x:Name="ellipse_decline_ans_lbl" Margin="650, 500, 0, 0">not defined</TextBlock>
+        <TextBlock Margin="450, 520, 0, 0">Ellipse eccentricity: </TextBlock>
+        <TextBlock x:ConnectionId='31' x:Name="ellipse_excentricity_ans_lbl" Margin="650, 520, 0, 0">not defined</TextBlock>
+
+        <Button x:ConnectionId='32' x:Name="read_file_btn" Width="100" Margin="20, 400, 0, 0"
+                                                
+             HorizontalAlignment="Left" VerticalAlignment="Top">
+            Read file
+        </Button>
+
+        <RichEditBox x:ConnectionId='33' x:Name="observations_notes_edtor"
+             Margin="20, 440, 0, 0"
+             Width="350" Height="100"
+             ToolTipService.ToolTip="Enter your observation notes here"
+             RelativePanel.Below="openFileButton"
+             HorizontalAlignment="Left" VerticalAlignment="Top"
+        />
+
+        <TextBlock x:ConnectionId='34' x:Name="info_lbl" Margin="20, 550, 0, 0" Width="400" Height="50" HorizontalAlignment="Left" VerticalAlignment="Top">
+            Please pick a text file
+        </TextBlock>
+
+        <Line x:ConnectionId='35' x:Name="a_line" Stroke="SteelBlue" StrokeThickness="3" />
+        <Line x:ConnectionId='36' x:Name="b_line" Stroke="SteelBlue" StrokeThickness="3" />
+        <Line x:ConnectionId='37' x:Name="c_line" Stroke="SteelBlue" StrokeThickness="3" />
+        <Line x:ConnectionId='38' x:Name="d_line" Stroke="SteelBlue" StrokeThickness="3" />
+        <Polyline x:ConnectionId='39' x:Name="e_line" Stroke="SteelBlue"  StrokeThickness="3"/>
+        <Ellipse x:ConnectionId='40' x:Name="approximated_curv_line" Stroke="DarkBlue" StrokeThickness="3" HorizontalAlignment="Left" VerticalAlignment="Top" 
+                 Width="50" Height=" 80"/>
+        <Polyline x:ConnectionId='41' x:Name="approximated_curv_line_2" Stroke="DarkBlue" StrokeThickness="2" />
+        
+    </Grid>    
+    
+</Page>
+
