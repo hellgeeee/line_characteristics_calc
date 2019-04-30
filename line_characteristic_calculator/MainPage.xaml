@@ -154,7 +154,7 @@
         <TextBlock x:Name="ellipse_center_ans_lbl" Margin="650, 460, 0, 0">not defined</TextBlock>
         <TextBlock Margin="450, 480, 0, 0">Ellipse semiaxes: </TextBlock>
         <TextBlock x:Name="ellipse_cemiaxes_ans_lbl" Margin="650, 480, 0, 0">not defined</TextBlock>
-        <TextBlock Margin="450, 500, 0, 0">Ellipse decline: </TextBlock>
+        <TextBlock Margin="450, 500, 0, 0">Ellipse decline (deg): </TextBlock>
         <TextBlock x:Name="ellipse_decline_ans_lbl" Margin="650, 500, 0, 0">not defined</TextBlock>
         <TextBlock Margin="450, 520, 0, 0">Ellipse eccentricity: </TextBlock>
         <TextBlock x:Name="ellipse_excentricity_ans_lbl" Margin="650, 520, 0, 0">not defined</TextBlock>

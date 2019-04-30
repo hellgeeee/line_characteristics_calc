@@ -180,8 +180,8 @@ void Calculator::calculateApproximatedCurve(void) {
 							// при этом пользуемся тем, что: (x/ax1)^2 + (y/ax2)^2 < (x/ax1 + y/ax2)^2 - т.к. понимаем, что возведение в квадрат - дорогостоящая операция
 							for (int i = 0; i < e.size(); i++) { // проходимся по всем точкам предполагаемого эллипса
 								deflection += abs(
-									pow((e.at(i).x - x0) / ax1, 2) +
-									pow(abs(e.at(i).y - y0) / ax2, 2) - 1
+									pow(  ( (e.at(i).x - x0)*cos(dec) + (e.at(i).y - y0)*sin(dec) )   / ax1, 2) +
+									pow(  ( (e.at(i).x - x0)*(-sin(dec)) + (e.at(i).y - y0)*cos(dec) ) / ax2, 2) - 1
 								);
 							}
 							if (deflection < min_deflection) {
@@ -261,7 +261,7 @@ void Calculator::calculateApproximatedCurve_2() { // Кусочно-полиномиальная аппр
 		float X_part[3][3];
 		for (int i = begin; i < begin + 3; i++)
 			for (int j = 0; j < 3; j++)
-				X_part[i][j] = X[i][j];
+				X_part[i-begin][j] = X[i][j];
 
 		// находим обратную матрицу, для этого:
 		// 1. находим матрицу миноров (и за одно определитель)
@@ -292,7 +292,7 @@ void Calculator::calculateApproximatedCurve_2() { // Кусочно-полиномиальная аппр
 
 		// полученную матрицу умножаем на единичный вектор
 		for (int i = 0; i < 3; i++) {
-			for (int j = 0; i < 3; i++)
+			for (int j = 0; j < 3; j++)
 				a[i] += X_minors[i][j];
 
 			// приращиваем среднее значение
@@ -301,7 +301,6 @@ void Calculator::calculateApproximatedCurve_2() { // Кусочно-полиномиальная аппр
 			else
 				a_avg[i] = a[i];
 		}
-
 
 	}
 

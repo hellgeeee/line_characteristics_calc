@@ -190,16 +190,31 @@ void MainPage::drawApproximatedCurve_2(float a0, float a1, float a2) {
 	// вот наша кривая: a0 * x^2 + a1 * x*y + a2 * y^2 = 1
 	// тогда D = b^2 - 4*a*c = (a1*y)^2 - 4*a0*(a2 * y^2 - 1)
 	// тогда x = (-b +- sqrt(D))/(2*a) = ( -a1*y +- sqrt((a1*y)^2 - 4*a0*(a2 * y^2 - 1)) ) / (2*a0)
-	float max = 100; 
+	float max = 30; 
 	float step = 1;
-	for (float y = 0; y <= max; y += step) {
+	vector<Point> arr_tmp_left, arr_tmp_right;
+	for (float y = -max; y <= max; y += step) {
 		float D = pow((a1*y), 2) - 4 * a0*(a2 * pow(y,2) - 1);
-		if ( (D >= 0) && (a0 != 0) ) {
-			float x = (-a1 * y + sqrt(pow((a1*y), 2) - 4 * a0*(a2 * pow(y, 2) - 1)) )/ (2 * a0);
-			approximated_curv_line_2->Points->Append(Point(x * scale + shift, y * scale));
-			x = (-a1 * y - sqrt(pow((a1*y), 2) - 4 * a0*(a2 * pow(y, 2) - 1)) )/ (2 * a0);
-			approximated_curv_line_2->Points->Append(Point(x * scale + shift, y * scale));
+		if ( (D >= 0) && a0 != 0)  {
+			float	x = (-a1 * y + sqrt(D))/ (2 * a0);
+				arr_tmp_left.push_back(Point(x * scale + shift, y * scale));
+
+				if (D > 0) {
+					x = (-a1 * y - sqrt(D)) / (2 * a0);
+					arr_tmp_right.push_back(Point(x * scale + shift, y * scale));
+				}
+
 		}
+	}
+
+	int len = arr_tmp_left.size();
+	for (int i = 0; i < len; i++) {
+		approximated_curv_line_2->Points->Append(arr_tmp_left.at(i));
+	}
+
+	len = arr_tmp_right.size();
+	for (int i = len-1; i >= 0; i--) {
+		approximated_curv_line_2->Points->Append(arr_tmp_right.at(i));
 	}
 
 }
