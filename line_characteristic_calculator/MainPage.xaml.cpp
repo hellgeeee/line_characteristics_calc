@@ -179,6 +179,7 @@ void MainPage::drawApproximatedCurve(float x_c, float y_c, float ax1, float ax2,
 
 }
 
+/*
 void MainPage::drawApproximatedCurve_2(float a0, float a1, float a2) {
 
 	// избавимся ото всех предыдущих рисунков
@@ -218,6 +219,7 @@ void MainPage::drawApproximatedCurve_2(float a0, float a1, float a2) {
 	}
 
 }
+*/
 
 void MainPage::calc_btn_click_callback() {
 	
@@ -278,7 +280,6 @@ void MainPage::calc_btn_click_callback() {
 			s_tmp = "" + f_tmp->GetAt(5);
 			ellipse_excentricity_ans_lbl->Text = s_tmp;
 
-			drawApproximatedCurve(f_tmp->GetAt(0), f_tmp->GetAt(1), f_tmp->GetAt(3), f_tmp->GetAt(4), f_tmp->GetAt(2));
 		}
 		else {
 			ellipse_center_ans_lbl->Text = "Initial data is not enough";
@@ -290,17 +291,17 @@ void MainPage::calc_btn_click_callback() {
 	} else { // посчитано вторым методом
 		calculator->calculateApproximatedCurve_2();
 		f_tmp = calculator->get_rez_curve();
-		drawApproximatedCurve_2(f_tmp->GetAt(0), f_tmp->GetAt(1), f_tmp->GetAt(2));
+/*		drawApproximatedCurve_2(f_tmp->GetAt(0), f_tmp->GetAt(1), f_tmp->GetAt(2));
 
 		ellipse_center_ans_lbl->Text = "You can not achieve this attitude with chosen method";
 		ellipse_cemiaxes_ans_lbl->Text = "You can not achieve this attitude with chosen method";
 		ellipse_decline_ans_lbl->Text = "You can not achieve this attitude with chosen method";
 		ellipse_excentricity_ans_lbl->Text = "IYou can not achieve this attitude with chosen method";
+*/
 	}
-
+	drawApproximatedCurve(f_tmp->GetAt(0), f_tmp->GetAt(1), f_tmp->GetAt(3), f_tmp->GetAt(4), f_tmp->GetAt(2));
 	calc_btn->IsEnabled = true;
 	info_lbl->Text = "Calculation is finished";
-
 }
 
 void MainPage::select_a_begin_callback() {

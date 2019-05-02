@@ -20,7 +20,7 @@ namespace line_characteristics_calculator
 		void fillCombo();
 		void drawGraph();
 		void MainPage::drawApproximatedCurve(float x_c, float y_c, float ax1, float ax2, float dec);
-		void MainPage::drawApproximatedCurve_2(float a0, float a2, float a3);
+		//void MainPage::drawApproximatedCurve_2(float a0, float a2, float a3);
 
 		void calc_btn_click_callback();
 		void select_a_begin_callback();

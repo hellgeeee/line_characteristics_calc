@@ -230,86 +230,228 @@ void Calculator::calculateApproximatedCurve(void) {
 }
 
 void Calculator::calculateApproximatedCurve_2() { // Кусочно-полиномиальная аппроксимация
-	// метод годится только для трех точек и более
-	if (e.size() < 3) {
+	// метод годится только для 5 точек и более
+	int n = 5;
+	if (e.size() < n) {
+		rez_curve = ref new Vector<float>();
 		rez_curve->Append(_FAKE_VALUE);
 		return;
 	}
 
-	// уравнение b^2*(x-x0)^2 + a^2*(y-y0)^2 = b^2*a^2 - описывает наш эллипс
-	// но он может быть и с уклоном, т.е. в общем случае запишется a0*x^2 + a1*x*y + a2*y^2 = a3
-	// если такую форму мы поделим на a3, то получим в такой форме: a0*x^2 + a1*x*y + a2*y^2 = 1
-	// В матричной записи будет так X*a=1 (единичный столбец)
-	// Из нее найдем a: a = X^-1 * 1 (т. е. a[0] = сумма всех элементов первой строки X^-1, a[1] = сумма всех элементов первой строки, a[2] = сумма всех элементов третьей строки)
+	// уравнение b^2*(x-x0)^2 + a^2*(y-y0)^2 = b^2*a^2 - описывает наш эллипс - это канонический вид
+	// но в общем виде запишется так A*x^2 + 2*В*x*y + С*y^2 + D*x + E*y + F = 0
+	// 1. найдем А, B, C, D, E, F, подставив все точки (их должно быть минимум 6, чтобы 6 уравнений и 6 неизвестных). Значит мы нашли уравнение общего вида
+	// есть 3 инварпанта У этого уравнения: определитель, составленный из всех коэффициентов; определитель, сост. из А, B, C; разность D-E.
+	// 2. т.е. они одинаковы и для уравнения общего вида, и для канонического. Найдя их, найдем уравнение канонического вида
+	// 3. по каноническому виду найдем полуоси, центр и угол поворота
+	float A = 0, B = 0, C = 0, D = 0, E = 0, F = 0;
+	float A_avg = 0, B_avg = 0, C_avg = 0, D_avg = 0, E_avg = 0, F_avg = 0; // здесь храним среднее арифметическое всех коэффициентов
 
-	float a[3] = { 0, 0, 0 };
-	float a_avg[3] = { 0, 0, 0 }; //здесь храним среднее арифметическое всех коэффициентов a
-
-	// определяем матрицу всех точек
-	int n = e.size();
+	// 1. 
+	// определяем матрицу X всех точек, где в строке будет x^2, y^2, xy, x, y. Тогда X*(A B 2C 2D 2E)=1
+	// = 1, потому что предполагаем, все уравнение поделено на свободный член
+	// решать уравнение относительно A B 2C 2D 2E будем методом Крамера
+	int points_num = e.size();
 	vector<vector<float>> X;
-	for (int i = 0; i < n; i++) {
+	for (int i = 0; i < points_num; i++) {
 		X.push_back(vector<float>());
 		X[i].push_back(pow(e[i].x, 2));
 		X[i].push_back(e[i].x * e[i].y);
-		X[i].push_back(pow(e[i].y, 2));
+		X[i].push_back(pow(e[i].y,2));
+		X[i].push_back(e[i].x);
+		X[i].push_back(e[i].y);
 	}
 
-	for (int begin = 0; begin <= n - 3; begin++)
-	{	// для одного трехточечного блока
-		// нас интересуют только трехмерные матрицы, поэтому копируем часть из всего пула
-		float X_part[3][3];
-		for (int i = begin; i < begin + 3; i++)
-			for (int j = 0; j < 3; j++)
-				X_part[i-begin][j] = X[i][j];
+	// инициализируем матрицу 5x5
+	vector<vector<float>> mat_tmp;
+	for (int i = 0; i < n; i++) {
+		vector<float> vec_tmp;
+		for (int i = 0; i < n; i++)	vec_tmp.push_back(0);
+		mat_tmp.push_back(vec_tmp);
+	}
 
-		// находим обратную матрицу, для этого:
-		// 1. находим матрицу миноров (и за одно определитель)
-		float X_minors[3][3];
-		float det = 0;
-		for (int i = 0; i < begin + 3; i++)
-			for (int j = 0; j < 3; j++)
-				for (int k1 = 0; k1 < 3; k1++)
-					for (int k2 = 0; k2 < 3; k2++)
-						if (k1 != i)
-							if ((k2 != j) && (k2 != k1)) {
-								X_minors[i][j] = pow(-1, i + j) * (X_part[k1][k1] * X_part[k2][k2] - X_part[k1][k2] * X_part[k2][k1]);
-								det += X_part[i][j] * X_minors[i][j];
-							}
-
-		// 2. транспонируем
-		for (int i = 0; i < 3; i++)
-			for (int j = 0; j < 3; j++) {
-				float tmp = X_minors[i][j];
-				X_minors[i][j] = X_minors[j][i];
-				X_minors[j][i] = tmp;
-			}
-
-		// 3. делим на определитель
-		for (int i = 0; i < 3; i++)
-			for (int j = 0; j < 3; j++)
-				X_minors[i][j] /= det;
-
-		// полученную матрицу умножаем на единичный вектор
-		for (int i = 0; i < 3; i++) {
-			for (int j = 0; j < 3; j++)
-				a[i] += X_minors[i][j];
-
-			// приращиваем среднее значение
-			if (a_avg[i] > 0)
-				a_avg[i] = (a_avg[i] + a[i]) / 2;
-			else
-				a_avg[i] = a[i];
+	int begin;
+	for (begin = 0; begin <= points_num - n; begin++)
+	{	// для одного 5x5-точечного блока копируем часть из всего пула
+		for (int i = begin; i < begin + n; i++) {
+			vector<float> vec_tmp;
+			for (int j = 0; j < n; j++)
+				mat_tmp[i - begin][j] = X[i][j];
 		}
 
+		// находим определитель блока
+		float det = determinant(mat_tmp);
+		if (det == 0) {
+			// some extra actioins
+		}
+
+		// для проверки
+		/*		vector<vector<float>> mat_delete;
+				vector<float> vec_delete;  vec_delete.push_back(2); vec_delete.push_back(3);
+				mat_delete.push_back(vec_delete);
+				mat_delete.push_back(vec_delete);
+				mat_delete[1][1] = 10; mat_delete[1][1] = 5;
+				float det_delete = determinor(mat_delete);
+		*/
+		float missed_koefs[5];
+		for (int i = 0; i < n; i++) {
+			vector<vector<float>> m_tmp = replaceByUnicolumt(mat_tmp, i);
+			float tmp = determinant(m_tmp);
+
+			missed_koefs[i] = determinant(replaceByUnicolumt(mat_tmp, i)) / det;
+		}
+
+		A = missed_koefs[0];
+		B = missed_koefs[1] / 2;
+		C = missed_koefs[2];
+		D = missed_koefs[3] / 2;
+		E = missed_koefs[4] / 2;
+		F = 1;
+
+		A_avg += A;
+		B_avg += B;
+		C_avg += C;
+		D_avg += D;
+		E_avg += E;
+
 	}
+	A_avg /= begin + 1;
+	B_avg /= begin + 1;
+	C_avg /= begin + 1;
+	D_avg /= begin + 1;
+	E_avg /= begin + 1;
+	F_avg = 1;
+
+	// далее приводим уравнение к каноническому виду - методом инвариантов
+	vector<vector<float>> inv_mat_tmp;
+	vector<float> vec_tmp;
+	vec_tmp.push_back(A_avg);
+	vec_tmp.push_back(B_avg);
+	vec_tmp.push_back(D_avg);
+	inv_mat_tmp.push_back(vec_tmp);
+	vec_tmp[0] = B_avg;
+	vec_tmp[1] = C_avg;
+	vec_tmp[2] = E_avg;
+	inv_mat_tmp.push_back(vec_tmp);
+	vec_tmp[0] = D_avg;
+	vec_tmp[1] = E_avg;
+	vec_tmp[2] = F_avg;
+	inv_mat_tmp.push_back(vec_tmp);
+
+	float inv_1 = A_avg + C_avg;
+	float inv_2 = A_avg*C_avg - B_avg*B_avg;
+	float inv_3	= determinant(inv_mat_tmp);
+
+	// Найдем коэф-ты канонического уравнения из системы
+	// A_canonical + C_canonical = inv1; A_canonical * C_canonical = inv2; A_canonical * C_canonical * F_canonical = inv_3
+	// отсюда 
+	float F_canonical = - inv_3 / inv_2;  
+	float C_canonical = (inv_1 + sqrt(pow(inv_1, 2) - 4 * inv_2)) / 2;
+	float A_canonical = inv_1 - C_canonical;
+
+	// Вытащим характеристики найденного эллипса
+	float x_center = (C_avg * D_avg - E_avg)/(B_avg - A_avg * C_avg);
+	float y_center = -D_avg - A_avg * x_center;
+
+	float decline_ang;
+	if (B_avg != 0)
+		decline_ang = atan((A_canonical - A_avg)/B_avg) / 3.14 * 180;
+	else
+		decline_ang = 0;
+	float cemiax1 = sqrt(1 / A_canonical / F_canonical);
+	float cemiax2 = sqrt(1 / C_canonical / F_canonical);
+
+	// далее вытаскиваем характеристики эллипса из уравнения канонического вида
 
 	IVector<float>^ rez = ref new Vector<float>();
-	rez->Append(a_avg[0]);
-	rez->Append(a_avg[1]);
-	rez->Append(a_avg[2]);
+	rez->Append(x_center);
+	rez->Append(y_center);
+	rez->Append(cemiax1);
+	rez->Append(cemiax2);
+	rez->Append(decline_ang);
 	rez_curve = rez;
 }
+
+// for determiner find
+void Calculator::permutate(vector<int>& a, int i1, int i2) {
+	int i_tmp = a.at(i1);
+	a.at(i1) = a.at(i2);
+	a.at(i2) = i_tmp;
+}
+
+bool Calculator::anotherPermutation(vector<int>& cur_permut, int n) {
+	int first_less = n - 2;
+	while (first_less != -1 && cur_permut[first_less] >= cur_permut[first_less + 1])
+		first_less--;
+	if (first_less == -1)
+		return false;
+	int bigger_then_less = n - 1;
+	while (cur_permut[first_less] >= cur_permut[bigger_then_less])
+		bigger_then_less--;
+	permutate(cur_permut, first_less, bigger_then_less);
+	int l = first_less + 1, r = n - 1;
+	while (l < r)
+		permutate(cur_permut, l++, r--);
+	return true;
+
+}
+
+vector<vector<int>> Calculator::allPermutations(int n) {
+	vector<vector<int>> rezult;
+	
+	// первая комбинация (без каких-либо перестановок)
+	vector<int> cur_permut;
+	for (int i = 0; i < n; i++)
+		cur_permut.push_back(i);
+	rezult.push_back(cur_permut);
+
+	while (anotherPermutation(cur_permut, n))
+		rezult.push_back(cur_permut);
+
+	return rezult;
+}
+
+short int Calculator::permutationParity(vector<int> permutation) {
+
+	// четность числа инверсий в перестановке
+	int inv_num = 0;
+	for (int i = 0; i < permutation.size(); i++) {
+		for (int j = i+1; j < permutation.size(); j++) {
+			if (permutation[i] > permutation[j]) {
+				inv_num += 1;
+			}
+		}
+	}
+	if (inv_num % 2 == 0)
+		return 1;
+	else
+		return -1;
+}
+
+float Calculator::determinant(vector<vector<float>> matrix) {
+
+	// для этого нужны всевозможные комбинации чисел от 1 до 6 без повторений	
+	float rezult = 0;
+	int n = matrix.size();
+	vector<vector<int>> combinations = allPermutations(n);
+	for (int i = 0; i < combinations.size(); i++) {
+		float addend = 1;
+		for (int j = 0; j < n; j++)
+			addend *= matrix[j][combinations[i][j]];
+		rezult += addend * permutationParity(combinations[i]);
+	}
+	return rezult;
+}
+
+vector<vector<float>> Calculator::replaceByUnicolumt(vector<vector<float>>mat_tmp, int replaced_col) {
+	vector<vector<float>> rezult = mat_tmp;
+	int n = mat_tmp.size();
+	for (int i = 0; i < n; i++) {
+		rezult[i][replaced_col] = 1;
+	}
+	return rezult;
+}
+
 
 // get and set methods
 IVector<float>^  Calculator::get_rez_curve() {

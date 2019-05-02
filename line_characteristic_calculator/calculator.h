@@ -87,6 +87,14 @@ namespace logical {
 		vector<_Point> all_points;
 		IVector<float>^ rez_curve;
 
+		// для поиска определителя
+		void permutate(vector<int>& a, int i1, int i2);
+		bool anotherPermutation(vector<int>& cur_permut, int n);
+		vector<vector<int>> allPermutations(int n);
+		short int permutationParity(vector<int> permutation);
+		float determinant(vector<vector<float>> matrix); 
+		vector<vector<float>> replaceByUnicolumt(vector<vector<float>>mat_tmp, int replaced_col);
+
 		_Point get_point_by_index(int index);
 		void readFile();
 	};
