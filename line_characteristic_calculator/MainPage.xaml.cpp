@@ -263,10 +263,10 @@ void MainPage::calc_btn_click_callback() {
 	}
 
 	if (method_combo->SelectedIndex == 0) {
-		calculator->calculateApproximatedCurve();
+		calculator->calculateApproximatedCurve_bruteForceMethod();
 
 		f_tmp = calculator->get_rez_curve();
-		if (f_tmp->GetAt(0) != _FAKE_VALUE) { // посчитано первым методом
+		if (f_tmp->GetAt(0) != _FAKE_VALUE) {
 
 			s_tmp = "(" + f_tmp->GetAt(0) + ", " + f_tmp->GetAt(1) + ")";
 			ellipse_center_ans_lbl->Text = s_tmp;
@@ -288,20 +288,27 @@ void MainPage::calc_btn_click_callback() {
 			ellipse_excentricity_ans_lbl->Text = "Initial data is not enough";
 		}
 
-	} else { // посчитано вторым методом
-		calculator->calculateApproximatedCurve_2();
+	} else if (method_combo->SelectedIndex == 1) { // кусочно-полиномиальный метод
+		calculator->calculateApproximatedCurve_partialPolinomialMethod();
 		f_tmp = calculator->get_rez_curve();
-/*		drawApproximatedCurve_2(f_tmp->GetAt(0), f_tmp->GetAt(1), f_tmp->GetAt(2));
 
 		ellipse_center_ans_lbl->Text = "You can not achieve this attitude with chosen method";
 		ellipse_cemiaxes_ans_lbl->Text = "You can not achieve this attitude with chosen method";
 		ellipse_decline_ans_lbl->Text = "You can not achieve this attitude with chosen method";
 		ellipse_excentricity_ans_lbl->Text = "IYou can not achieve this attitude with chosen method";
-*/
+
+	} else if (method_combo->SelectedIndex == 2) { // метод "в лоб", но с уточнениями
+
+		calculator->calculateApproximatedCurve_bruteForceMethod_optimized();
+		f_tmp = calculator->get_rez_curve();
+
 	}
-	drawApproximatedCurve(f_tmp->GetAt(0), f_tmp->GetAt(1), f_tmp->GetAt(3), f_tmp->GetAt(4), f_tmp->GetAt(2));
+
+	if (f_tmp->GetAt(0) != _FAKE_VALUE )
+		drawApproximatedCurve(f_tmp->GetAt(0), f_tmp->GetAt(1), f_tmp->GetAt(2), f_tmp->GetAt(3), f_tmp->GetAt(4));
 	calc_btn->IsEnabled = true;
 	info_lbl->Text = "Calculation is finished";
+
 }
 
 void MainPage::select_a_begin_callback() {

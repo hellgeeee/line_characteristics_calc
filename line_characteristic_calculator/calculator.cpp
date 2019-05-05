@@ -147,7 +147,7 @@ IVector<float>^ Calculator::calculateLinesCross(void) {
 }
 
 //Windows::Foundation::IAsyncAction^ 
-void Calculator::calculateApproximatedCurve(void) {
+void Calculator::calculateApproximatedCurve_bruteForceMethod(void) {
 	//	return concurrency::create_async([this](Windows::Storage::Streams::IRandomAccessStreamWithContentType^ stream)
 	//	{
 
@@ -155,7 +155,7 @@ void Calculator::calculateApproximatedCurve(void) {
 
 	if (e.front().x != _FAKE_VALUE) {
 
-		float center_x, center_y, cemiax_big, cemiax_small, decline, excentricity;
+		float x_center = _FAKE_VALUE, y_center = _FAKE_VALUE, cemiax_big = _FAKE_VALUE, cemiax_small = _FAKE_VALUE, decline_ang = _FAKE_VALUE, excentricity = _FAKE_VALUE;
 		// нечто вроде МНК. Минус: медленно работает.
 		float deflection = 0;
 		float min_deflection = 200;
@@ -165,7 +165,7 @@ void Calculator::calculateApproximatedCurve(void) {
 		float max_semiaxis_size = 20;
 
 
-		float ax1_rez, ax2_rez;
+		float cemiax1, cemiax2;
 		for (float ax1 = step; ax1 < max_semiaxis_size; ax1 += step) {
 			for (float ax2 = step; ax2 < max_semiaxis_size; ax2 += step) {
 
@@ -186,10 +186,10 @@ void Calculator::calculateApproximatedCurve(void) {
 							}
 							if (deflection < min_deflection) {
 								min_deflection = deflection;
-								center_x = x0;
-								center_y = y0;
-								ax1_rez = ax1;
-								ax2_rez = ax2;
+								x_center = x0;
+								y_center = y0;
+								cemiax1 = ax1;
+								cemiax2 = ax2;
 								if (ax1 < ax2) {
 									cemiax_small = ax1;
 									cemiax_big = ax2;
@@ -198,7 +198,7 @@ void Calculator::calculateApproximatedCurve(void) {
 									cemiax_small = ax2;
 									cemiax_big = ax1;
 								}
-								decline = dec;
+								decline_ang = dec;
 							}
 
 						}
@@ -212,13 +212,12 @@ void Calculator::calculateApproximatedCurve(void) {
 
 		excentricity = sqrt(1 - pow(cemiax_small / cemiax_big, 2));
 
-		rez->Append(center_x);
-		rez->Append(center_y);
-		rez->Append(decline);
-		rez->Append(ax1_rez);
-		rez->Append(ax2_rez);
+		rez->Append(x_center);
+		rez->Append(y_center);
+		rez->Append(cemiax1);
+		rez->Append(cemiax2);
+		rez->Append(decline_ang);
 		rez->Append(excentricity);
-
 	}
 	else {
 		rez->Append(_FAKE_VALUE);
@@ -229,8 +228,9 @@ void Calculator::calculateApproximatedCurve(void) {
 	//	}); // async method
 }
 
-void Calculator::calculateApproximatedCurve_2() { // Кусочно-полиномиальная аппроксимация
+void Calculator::calculateApproximatedCurve_partialPolinomialMethod() { // Кусочно-полиномиальная аппроксимация
 	// метод годится только для 5 точек и более
+	// проблема метода: работает только если точки точно принадлежат эллипсу. Иначе выдаст уравнение кривой, которая эллипсом не является.
 	int n = 5;
 	if (e.size() < n) {
 		rez_curve = ref new Vector<float>();
@@ -295,9 +295,6 @@ void Calculator::calculateApproximatedCurve_2() { // Кусочно-полиномиальная аппр
 		*/
 		float missed_koefs[5];
 		for (int i = 0; i < n; i++) {
-			vector<vector<float>> m_tmp = replaceByUnicolumt(mat_tmp, i);
-			float tmp = determinant(m_tmp);
-
 			missed_koefs[i] = determinant(replaceByUnicolumt(mat_tmp, i)) / det;
 		}
 
@@ -306,7 +303,7 @@ void Calculator::calculateApproximatedCurve_2() { // Кусочно-полиномиальная аппр
 		C = missed_koefs[2];
 		D = missed_koefs[3] / 2;
 		E = missed_koefs[4] / 2;
-		F = 1;
+		F = -1;
 
 		A_avg += A;
 		B_avg += B;
@@ -320,7 +317,7 @@ void Calculator::calculateApproximatedCurve_2() { // Кусочно-полиномиальная аппр
 	C_avg /= begin + 1;
 	D_avg /= begin + 1;
 	E_avg /= begin + 1;
-	F_avg = 1;
+	F_avg = -1;
 
 	// далее приводим уравнение к каноническому виду - методом инвариантов
 	vector<vector<float>> inv_mat_tmp;
@@ -358,8 +355,8 @@ void Calculator::calculateApproximatedCurve_2() { // Кусочно-полиномиальная аппр
 		decline_ang = atan((A_canonical - A_avg)/B_avg) / 3.14 * 180;
 	else
 		decline_ang = 0;
-	float cemiax1 = sqrt(1 / A_canonical / F_canonical);
-	float cemiax2 = sqrt(1 / C_canonical / F_canonical);
+	float cemiax1 = sqrt(abs(1 / A_canonical / -F_canonical));
+	float cemiax2 = sqrt(abs(1 / C_canonical / -F_canonical));
 
 	// далее вытаскиваем характеристики эллипса из уравнения канонического вида
 
@@ -371,6 +368,155 @@ void Calculator::calculateApproximatedCurve_2() { // Кусочно-полиномиальная аппр
 	rez->Append(decline_ang);
 	rez_curve = rez;
 }
+
+void Calculator::calculateApproximatedCurve_bruteForceMethod_optimized(void) {
+	// метод - нечто вроде МНК. Минус: медленно работает.
+
+	// 0. обработали ситуацию, когда точек недостаточно
+	IVector<float>^ rez = ref new Vector<float>();
+	if (e.front().x == _FAKE_VALUE) {
+		rez->Append(_FAKE_VALUE);
+		rez_curve = rez;
+		return;
+	}
+
+	// считаем, что работаем с функциональной зависимостью, т.е. x[i] <= x[i+1] для любого i
+	// здесь пытаемся разобраться, в каких пределах можно искать эллипс
+
+	// 1. убывает кривая или возрастает?
+	bool is_curve_increase = (e[0].y < e[1].y)||(e[1].y < e[2].y);
+
+	// 2. В каких пределах искать полуоси эллипса?
+	float ax_x_min = (e.back().x - e.front().x)/2;
+	float ax_x_max = (e.back().x - e.front().x)*2;
+	float ax_y_min = _FAKE_VALUE;
+	float ax_y_max = _FAKE_VALUE;
+
+	// 3. Самая левая и самая правая возможные точки эллипса?
+	float lefter_point = e.front().x - ax_x_max;
+	float righter_point = e.back().x + ax_x_max;
+
+	// 4. Самая высокая и самая низкая возможные точки эллипса?
+	// если найдем точку максимума, минимум оценим как самую низкую точку из возможных. Если найдем минимум - наоборот.
+	float lower_point = _FAKE_VALUE;
+	float heigher_point = _FAKE_VALUE;
+	if (is_curve_increase) {
+		for (int i = 1; i < e.size(); i++) {
+			if (e[i - 1].y >= e[i].y) {
+				heigher_point = e[i].y;// maximum
+				if(e.front().y < e.back().y) ax_y_min = (e[i].y - e.front().y) / 2; else ax_y_min = (e[i].y - e.back().y) / 2;
+					ax_y_max = ax_y_min * 4;
+					lower_point = heigher_point - 2 * ax_y_max;
+				break;
+			}
+		}
+	}
+	else {
+		for (int i = 1; i < e.size(); i++) {
+			if (e[i - 1].y <= e[i].y) {
+				lower_point = e[i].y;// minimum
+				if (e.front().y > e.back().y) ax_y_min = (e.front().y - e[i].y) / 2; else ax_y_min = (e.back().y - e[i].y) / 2;
+					ax_y_max = ax_y_min * 4;
+					heigher_point = lower_point + 2 * ax_y_max;
+				break;
+			}
+		}
+	}
+
+	// 4.1. если не нашли макс или мин
+	if ((lower_point == _FAKE_VALUE)&&(heigher_point == _FAKE_VALUE)) {
+		if (is_curve_increase) {  
+			ax_y_min = e.back().y - e.front().y;
+			ax_y_max = ax_y_min * 4;
+			lower_point = e.front().y - ax_y_max; 
+			heigher_point = e.back().y + ax_y_max;
+		}
+		else { 
+			ax_y_min = e.front().y - e.back().y;
+			ax_y_max = ax_y_min * 4;
+			lower_point = e.back().y - ax_y_max; 
+			heigher_point = e.front().y + ax_y_max; 
+		}
+	}
+
+
+	// 5. Перебор
+	// значения, которые будем считать правдивыми (нормальными, хорошими)
+	float center_x = _FAKE_VALUE, center_y = _FAKE_VALUE, cemiax_big = _FAKE_VALUE, cemiax_small = _FAKE_VALUE, decline = _FAKE_VALUE, excentricity = _FAKE_VALUE;
+	float min_deflection = 400; // экспериментально оценили оптимальный вариант допустимого отклонения реального от идиального
+	float deflection = min_deflection; 
+	float acceccable_deflection = 1;
+	float step = (ax_x_max + ax_y_max)/50, ang_step = 3.14/20; 
+
+	float ax1_rez, ax2_rez;
+	for (float ax_x = ax_x_min; ax_x < ax_x_max && deflection >= acceccable_deflection; ax_x += step) {
+		for (float ax_y = ax_y_min; ax_y < ax_y_max && deflection >= acceccable_deflection; ax_y += step) {
+
+			for (float x0 = lefter_point + ax_x; x0 < righter_point - ax_x && deflection >= acceccable_deflection; x0 += step) {
+				for (float y0 = lower_point + ax_y; y0 < heigher_point - ax_y && deflection >= acceccable_deflection; y0 += step) {
+
+					for (float dec = 0; dec < 3.14 && deflection >= acceccable_deflection; dec += ang_step) {
+
+						deflection = 0;
+						// эллипс: (x/ax1)^2 + (y/ax2)^2 = 1;
+						// перебираем центральные точки, полуоси и наклоны (с учетом предполагаемых нами диапазонов). Подставляем в такое уравнение имеющиеся точки
+						// при этом пользуемся тем, что: (x/ax1)^2 + (y/ax2)^2 < (x/ax1 + y/ax2)^2 - т.к. понимаем, что возведение в квадрат - дорогостоящая операция
+						for (int i = 0; i < e.size(); i++) { // проходимся по всем точкам предполагаемого эллипса
+							float cos_tmp = cos(dec), sin_tmp = sin(dec);
+							deflection += abs(
+								pow(((e.at(i).x - x0)*cos_tmp + (e.at(i).y - y0)*sin_tmp) / ax_x, 2) +
+								pow(((e.at(i).x - x0)*(-sin_tmp) + (e.at(i).y - y0)*cos_tmp) / ax_y, 2) - 1
+							);
+						}
+						if (deflection < min_deflection) {
+							min_deflection = deflection;
+							center_x = x0;
+							center_y = y0;
+							ax1_rez = ax_x;
+							ax2_rez = ax_y;
+							if (ax_x < ax_y) {
+								cemiax_small = ax_x;
+								cemiax_big = ax_y;
+							}
+							else {
+								cemiax_small = ax_y;
+								cemiax_big = ax_x;
+							}
+							decline = dec;
+
+						}
+
+					}
+
+				}
+			}
+
+
+		}
+	}
+
+	// 6. Обрабатываем ситуацию, когда так ничего и не нашлось
+	if(cemiax_small == _FAKE_VALUE){
+		rez->Append(_FAKE_VALUE);
+		rez_curve = rez;
+		return;
+	}
+
+	// 7. Сохраняем результат
+	excentricity = sqrt(1 - pow(cemiax_small / cemiax_big, 2));
+	rez->Append(center_x);
+	rez->Append(center_y);
+	rez->Append(ax1_rez);
+	rez->Append(ax2_rez);
+	rez->Append(decline);
+	rez->Append(excentricity);
+
+	rez_curve = rez;
+
+	//	}); // async method
+}
+
+
 
 // for determiner find
 void Calculator::permutate(vector<int>& a, int i1, int i2) {

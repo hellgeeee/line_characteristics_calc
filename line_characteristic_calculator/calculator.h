@@ -19,8 +19,9 @@ namespace logical {
 		float calculateStep();
 		float calculateLinesAngle();
 		IVector<float>^ calculateLinesCross(); //x, y
-		void calculateApproximatedCurve(); // x, y of center, decline in degrees, big ax/2, small ax/2 // Метод перебора
-		void calculateApproximatedCurve_2(); // x, y of center, decline in degrees, big ax/2, small ax/2 // Кусочно-полиномиальная аппроксимация
+		void calculateApproximatedCurve_bruteForceMethod(); // x, y of center, decline in degrees, big ax/2, small ax/2 // Метод перебора
+		void calculateApproximatedCurve_partialPolinomialMethod(); // x, y of center, decline in degrees, big ax/2, small ax/2 // Кусочно-полиномиальная аппроксимация
+		void calculateApproximatedCurve_bruteForceMethod_optimized(void);
 
 		void clear();
 
@@ -87,7 +88,7 @@ namespace logical {
 		vector<_Point> all_points;
 		IVector<float>^ rez_curve;
 
-		// для поиска определителя
+		// для поиска определителя (для метода кусочно-полиномиальной аппроксимации)
 		void permutate(vector<int>& a, int i1, int i2);
 		bool anotherPermutation(vector<int>& cur_permut, int n);
 		vector<vector<int>> allPermutations(int n);
