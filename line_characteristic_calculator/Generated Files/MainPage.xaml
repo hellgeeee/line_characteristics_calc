@@ -140,8 +140,9 @@
 
         <ComboBox x:ConnectionId='24' x:Name="method_combo" Header="Method" PlaceholderText="Choose method for approximation" Width="150" Margin="650, 340, 0, 0">
             <x:String>Brute force method</x:String>
-            <x:String>Piece-polynomial approximation</x:String>
+            <x:String>Piece-polynomial approximation (in developing)</x:String>
             <x:String>Brute force method optimized</x:String>
+            <x:String>Lagrange polynoms method (in developing)</x:String>
         </ComboBox>
         
 
