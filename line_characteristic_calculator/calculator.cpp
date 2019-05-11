@@ -508,7 +508,7 @@ void Calculator::calculateApproximatedCurve_bruteForceMethod_optimized(void) {
 	rez->Append(center_y);
 	rez->Append(ax1_rez);
 	rez->Append(ax2_rez);
-	rez->Append(decline);
+	rez->Append(decline / 3.14 * 180);
 	rez->Append(excentricity);
 
 	rez_curve = rez;
